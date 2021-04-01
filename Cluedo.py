@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+Detectives today started sifting the evidences at the Tudor Hall, home of the late Dr.Black who was found
+murdered last Thursday evening. A number of suspects - guests of Dr.Black - are being questioned. A collection of items
+said to be the possible murder weapons have been found too.
+
 The idea of Cluedo is to move from room to room to eliminate people, places, and weapons.
 The player who correctly accuses Who, What, and Where wins.
 Note: You can only enter in a room when your points are 8 or more than 8.
@@ -123,14 +127,15 @@ def dice_s():
 
 
 def shuffle_cards(t_cards, num_players, players_nicknames):
-    """ Shuffle cards and distribute among players. Returns two dictionaries: 1.) nickname-cards 2.)Answer Cards. """
+    """ Shuffle cards and distribute among players.
+    Returns two dictionaries: 1.) nickname-their cards 2.) Murder Envelope cards. """
     x = 0
     y = int(15 / num_players)
     count = y
     excess_cards = 15 % num_players
     temp_decs = []
     p_cards = []
-    params = ["Killer", "Weapon", "Place"]
+    params = ["Killer", "Weapon", "Place"]  # .................................... Keys to access Murder Envelope cards.
     for i in range(0, 3):
         random.shuffle(t_cards[i])
         secret_deck.update({params[i]: t_cards[i][i]})
@@ -289,7 +294,7 @@ def show_player_detail():
 
 
 def main_game():
-    """Passes player name turn-by-turn until one player wins."""
+    """Passes player name to 'player_turn' function turn-by-turn until one player wins."""
     iter_nickname = itertools.cycle(nicknames)
     nickname = next(iter_nickname)
     win = False
