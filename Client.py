@@ -2,6 +2,7 @@ import socket
 import threading
 
 host = "127.0.0.1"
+# If you are playing in LAN then make sure you chance the host address to IPV4 address of game server.
 
 user_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 user_socket.connect((host, 55555))
