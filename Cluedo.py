@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+"""
+The idea of Cluedo is to move from room to room to eliminate people, places, and weapons.
+The player who correctly accuses Who, What, and Where wins.
+Note: You can only enter in a room when your points are 8 or more than 8.
+Author: Kartikay Chiranjeev Gupta
+Date of modification: 1/4/2021
+"""
+
 import socket
 import threading
 import random
@@ -73,12 +82,13 @@ rooms = {1: "Hall", 2: "Lounge", 3: "Library", 4: "Kitchen", 5: "Billiard Room",
 print("________________Setting up the Game Server__________________")
 server_type = input("Choose the type of server...\n1.)Offline Server\n2.)Online Server\n")
 if server_type == "1":
-    server_type = "127.0.0.1"
+    server_type = "127.0.0.1"  # .................................................................Local host IP address.
 elif server_type == "2":
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        server.connect(("8.8.8.8", 80))  # Google DNS - For your IPV4 Address.
+        server.connect(("8.8.8.8", 80))  # ..................................Using Google DNS -To get your IPV4 Address.
         server_type = server.getsockname()[0]
+        print(f"Players can connect using: {server_type} address.")
         server.close()
     except Exception as online_error:
         print(f"{online_error}: Check your internet connection.")
@@ -89,17 +99,18 @@ else:
 
 n_players = int(input("Enter the number of players (2-6)\n(Least 3 players are recommended)\n"))
 if type(n_players) == int and 6 >= n_players >= 2:
-    pass
+    print("Waiting for players to join....")
 else:
     print("Invalid character entered.")
     sys.exit(1)
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((server_type, 1926))
+server.bind((server_type, 55555))
 server.listen(n_players)
 
 
 def send_all(message, ex_id=""):
+    """ Sends message to all players in the game. """
     for player in players:
         if player == ex_id:
             continue
@@ -107,10 +118,12 @@ def send_all(message, ex_id=""):
 
 
 def dice_s():
+    """ Dice simulator. """
     return random.randint(1, 6)
 
 
 def shuffle_cards(t_cards, num_players, players_nicknames):
+    """ Shuffle cards and distribute among players. Returns two dictionaries: 1.) nickname-cards 2.)Answer Cards. """
     x = 0
     y = int(15 / num_players)
     count = y
@@ -142,6 +155,8 @@ def shuffle_cards(t_cards, num_players, players_nicknames):
 
 
 def player_nickname(player):
+    """ Ask newly joined players to choose and nickname and checks if there is no same name collision."""
+
     player.send("Please choose a nickname: ".encode("utf-8"))
     nickname = player.recv(1024).decode("utf-8")
     while nickname in nicknames:
@@ -154,6 +169,7 @@ def player_nickname(player):
 
 
 def accept_requests():
+    """Accepts new connection until selected number of people join."""
     global players_deck, secret_deck
     while len(players) < n_players:
         send_all("Waiting for other players to join...")
@@ -182,6 +198,8 @@ def accept_requests():
 
 
 def player_turn(nickname):
+    """Ask the given player to roll dice and enter in room to make suggestion if applicable.
+    returns True only when player wins."""
     player_id = members[nickname]
     temp_win = True
     player_id.send("---------------------------------------------------\n".encode("utf-8"))
@@ -261,6 +279,7 @@ def player_turn(nickname):
 
 
 def show_player_detail():
+    """Display each player their cards and points."""
     for name in nicknames:
         player_id = members[name]
         point = player_point[name]
@@ -269,7 +288,8 @@ def show_player_detail():
         player_id.send(f"Your Cards: {deck}\nYour points: {point}\n\n".encode("utf-8"))
 
 
-def main_game():  # ADD A FORCIBLY CLOSED CONNECTION SOLUTION.
+def main_game():
+    """Passes player name turn-by-turn until one player wins."""
     iter_nickname = itertools.cycle(nicknames)
     nickname = next(iter_nickname)
     win = False

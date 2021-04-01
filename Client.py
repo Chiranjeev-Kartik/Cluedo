@@ -1,10 +1,10 @@
 import socket
 import threading
-import sys
 
 host = "127.0.0.1"
+
 user_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-user_socket.connect((host, 1926))
+user_socket.connect((host, 55555))
 
 
 def send_message():
