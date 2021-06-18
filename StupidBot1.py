@@ -8,6 +8,7 @@ user_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 user_socket.connect((host, 55555))
 
 nickname = 'StupidBot1'
+remembered_cards = False
 Mycards = [[], [], []]
 suspects = {1: "Colonel Mustard", 2: "Professor Plum", 3: "Reverend Green", 4: "Mrs. Peacock", 5: "Miss Scarlett",
             6: "Mrs. White"}
@@ -54,6 +55,7 @@ def listening():
 def remember_cards(cards_message):
     cards_to_remember = cards_message
     print(f"I need to remember these cards:{cards_to_remember}")
+    remembered_cards = True
     return None
 
 
@@ -64,14 +66,21 @@ def bot_act_on_message(message):
     elif message.find('Want to enter in a room') != -1:
         print(f"Saying yes to enter a room")
         send_bot_message("y")
-    elif message.find('Your Cards') != -1:
+    elif message.find('Choose a room to enter') != -1:
+        print(f"Choosing the hall")
+        send_bot_message("1")
+    elif message.find('Choose Suspect and Weapon') != -1:
+        print(f"Mustard and Dagger")
+        send_bot_message("1 1")
+    elif message.find('Your Cards') != -1 and remembered_cards:
         print(f"Need to remember these cards")
         remember_cards(message)
+    elif message.find('Do you want to revel cards') != -1:
+        print(f"I'm too stupid to revel cards")
+        send_bot_message("n")
     elif message.find('Roll Dice') != -1:
         print(f"Trying to roll dice")
         send_bot_message("y")
-    else:
-        print(f"I need to do something else")
     return None
 
 
