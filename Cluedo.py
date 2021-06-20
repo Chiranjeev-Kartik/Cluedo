@@ -8,11 +8,11 @@ The idea of Cluedo is to move from room to room to eliminate people, places, and
 The player who correctly accuses Who, What, and Where wins.
 Note: You can only enter in a room when your points are 8 or more than 8.
 Author: Kartikay Chiranjeev Gupta
-Date of modification: 1/4/2021
+Last Date of modification: 20/6/2021
 """
 
 import socket
-import threading
+import re
 import random
 import sys
 import time
@@ -24,6 +24,7 @@ members = {}
 players_deck = {}
 player_point = {}
 secret_deck = {}
+valid_name_pattern = r'[A-Za-z0-9-_]*'
 game_art1 = '''
 ==================================================================
 Welcome to the classic detective game: 
@@ -164,6 +165,13 @@ def player_nickname(player):
 
     player.send("Please choose a nickname: ".encode("utf-8"))
     nickname = player.recv(1024).decode("utf-8")
+    while True:
+        if re.fullmatch(valid_name_pattern, nickname):
+            break
+        else:
+            player.send('Invalid character used !'.encode("utf-8"))
+            player.send("Choose a valid nickname: ".encode("utf-8"))
+            nickname = player.recv(1024).decode("utf-8")
     while nickname in nicknames:
         player.send("This name is not available!\nPlease choose another nickname: ".encode("utf-8"))
         nickname = player.recv(1024).decode("utf-8")
