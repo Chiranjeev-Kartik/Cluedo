@@ -269,8 +269,8 @@ def player_turn(nickname):
                         player_id.send(f"{name} has {accuse}.".encode("utf-8"))
                         temp_win = False
                         break
-                    else:
-                        continue
+                if not temp_win:
+                    break
             if temp_win:
                 send_all(f"No proof against {nickname}'s suggestion.")
             player_id.send("Do you want to revel cards ?(y/n)".encode("utf-8"))
@@ -307,7 +307,9 @@ def main_game():
     nickname = next(iter_nickname)
     win = False
     while not win:
+        time.sleep(1)
         show_player_detail()
+        time.sleep(1)
         win = player_turn(nickname)
         nickname = next(iter_nickname)
     send_all("\nThanks for playing.")

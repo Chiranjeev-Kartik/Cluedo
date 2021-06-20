@@ -2,9 +2,11 @@ import re
 import socket
 import threading
 import random
+import time
 
 initialised = False
 pattern_1 = r'([A-Za-z0-9-_]*) has ([A-Za-z .]*).'
+winning = False
 
 
 class CluedoBot:
@@ -32,6 +34,7 @@ class CluedoBot:
         Eliminates Bot's cards from possible choices.
         """
         global initialised
+
         if not initialised:
             for i in message.split("'"):
                 if i in self.possible_answer:
@@ -67,9 +70,8 @@ class CluedoBot:
 
     def send_bot_message(self, bot_message):
         try:
-            message = bot_message
-            print(message)
-            self.user_socket.send(message.encode("utf-8"))
+            print(bot_message)
+            self.user_socket.send(bot_message.encode("utf-8"))
         except Exception as error:
             print(f"Send Error:{error}")
         return None
@@ -78,29 +80,41 @@ class CluedoBot:
         """
         Match incoming messages from game and react accordingly.
         """
+        global winning
+        # print(self.possible_answer)
         if 'Hey there' in message:
+            time.sleep(1)
             self.send_bot_message(next(self.nickname))
         elif 'This name is not available' in message:
+            time.sleep(1)
             self.send_bot_message(next(self.nickname))
         elif 'Your Cards' in message and not initialised:
             self.initialise_cards(message)
-        elif "Hit 'y' to Roll Dice" in message:
-            self.send_bot_message('y')
+        elif "Roll Dice" in message:
+            time.sleep(1)
+            self.send_bot_message("y")
         elif 'Want to enter in a room' in message:
+            time.sleep(1)
             choice = random.choices(['y', 'n'], weights=(98, 2))
             self.send_bot_message(*choice)
         elif 'Choose a room to enter' in message:
+            time.sleep(1)
             self.choose_room()
         elif '6.) Mrs. White' in message:
+            time.sleep(1)
             self.choose_suspect_and_weapon()
         elif 'Do you want to revel cards' in message:
-            choice = random.choices(['y', 'n'], weights=(2, 98))
+            time.sleep(1)
+            if winning:
+                choice = random.choices(['y', 'n'], weights=(98, 2))
+            else:
+                choice = random.choices(['y', 'n'], weights=(2, 98))
             self.send_bot_message(*choice)
         elif re.fullmatch(pattern_1, message):
             self.possible_answer.remove(re.fullmatch(pattern_1, message).group(2))
-            print(re.fullmatch(pattern_1, message).group(2))
         elif 'No proof against' in message:
-            self.send_bot_message('y')
+            time.sleep(1)
+            winning = True
 
     def listening(self):
         while True:
